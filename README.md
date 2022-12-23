@@ -1,0 +1,1 @@
+This repo contains all the docker related scripts and notes
