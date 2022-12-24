@@ -1,0 +1,60 @@
+Command: docker run
+Explanation: The 'docker run' command is used to run a container from an image
+Example: docker run nginx
+
+
+Command: docker ps 
+Explanation: The 'docker ps' lists all running containers and some basic information about them
+
+
+Command: docker ps -a
+Explanation: This command lists all running as well as previously stopped or exited containers
+
+
+Command: docker stop
+Explanation: Use this command to stop a running containers, provide eithter the container ID or name
+Example: docker stop silly_sammet
+
+
+Command: docker rm 
+Explanation: Use this command to remove a stopped/exited container in order to free up the space
+Example: docker rm silly_sammet
+
+
+Command: docker images
+Explanation: Run this command to see the list of all available images
+
+
+Command: docker rmi
+Explanation: Run this command to remove an image. But ensure that no container is running out of that 
+image before you delete. You have to stop and delete all dependent container (either running or stopped)
+to be able to delete an image.
+Example: docker rmi nginx
+
+
+Command: docker pull
+Explanation: Use this command to only download an image
+Example: docker pull nginx
+
+
+A container only lives as long as the process inside it is alive. This is why when you run a container
+from an Ubuntu image it stops immediately because Ubuntu is just an image of an OS that is used as
+the base image for other applications. There is no process/application running in it by default.
+
+
+Append a command
+Example: docker run ubuntu sleep 5
+
+
+Command: exec
+Explanation: Use this command to execute a command on a running container
+Example: docker exec {container_name} cat /etc/hosts
+
+
+Command: attach and detach
+Explanation: When you run 'docker run {image_name}', it runs the container in the foreground or in an
+attached mode, meaning you will be attached to the console or the standard out of the docker container
+and you will see the output of the web service on your screen. Another option is to run the docker
+container in the detached mode by providing the -d option. If you would like to attach to the running
+container later, run the docker attach command
+Example: docker run -d {image_name}; docker attach {container_id}
