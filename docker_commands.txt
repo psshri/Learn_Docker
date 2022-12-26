@@ -23,3 +23,8 @@ docker inspect {container_name/container_id}
 
 docker logs {container_name/container_id}
 
+docker build Dockerfile -t psshri/mywebapp
+
+docker push psshri/mywebapp
+
+docker history {image_name}
