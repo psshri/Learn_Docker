@@ -1,0 +1,85 @@
+Command: docker run redis
+Explaination: Run a container running a redis service with its latest version
+
+Command: docker run redis:4.0
+Explaination: Run a specific version of redis image. If you do not specify any tag for version, docker
+will run the latest version by default. Default tag is latest.
+
+Run - STDIN
+If we have an application that asks user for an input then prints something on the screen and if we
+were to containerize that application then, our container won't ask for user input, it will just print
+whatever it is supposed to print. That is because by default, the docker container does not listen to 
+a standard input. Even though you're attached to its console, it is not able to read any input from 
+you. It doesn't have a terminal to read inputs from. It runs in a non-interactive mode. If you would like
+to provide your input, you need to map the standard input of your host to the docker container using the
+-i parameter. The -i parameter is for interactive mode. Also, in order to attach to the container's
+terminal, use -t option as well. The -t stands for psuedo terminal. With the combinatio of -i and t,
+you will be attached to the terminal as well as in an interactive mode on the container. 
+Example: docker run -it {image_name}
+
+Run - PORT mapping
+Every docker container gets an IP address assigned by default. This is an internal IP and is only
+accessible within the docker host. If the container is listening at port 5000, then you can open a 
+browser from within the docker host, you can go to http://ipaddress:5000/ to access the IP address. 
+But since this is an internal IP address, users outside of the docker host cannot access it using this IP.
+For this we can use the IP of the docker host. But for that to work, you must have mapped the port inside
+the docker container to a free port on the docker host. For example, if I want the users to access my
+application through port 80 on my docker host, I could map port 80 of local host to port 5000 on the
+docker container using the -P parameter in the run command
+Example: docker run -p 80:5000 kodekloud/webapp
+Now the user can access my application by going to the url http://ipaofdockerhost:80. All the traffic
+on port 80 on my Docker host will get routed to port 5000 inside the docker container. This way you can
+run multiple instances of your application and map them to different ports on the docker host.
+Example: docker run -p 8000:5000 kodekloud/webapp
+You cannot map to the same port on the docker host more than once
+
+Run - Volume Mapping
+Let's see how data is persisted in the docker container. When you create a mysql container, the data
+files are stored in location /var/lib/mysql inside the docker container. The docker container has its
+own isolated file system and any changes to any files happen within the container. When a container is 
+deleted, the data inside it is also lost. If you want to persist data, you need to map a directory
+outside the container on the Docker host to a directory inside the container.
+Example: docker run -v /opt/datadir:/var/lib/mysql mysql
+This command runs a mysql container and maps docker host's directory /opt/datadir to container's 
+directory /var/lib/mysql
+The container will implicitly mounts the external directory to a folder inside the docker container.
+This way all the data will now be stored in the external volume at /opt/data directory and thus the data
+will remain even if you delete the docker container.
+
+Run - Inspect Containers
+Command: docker inspect {container_name/container_id}
+It returns all the details of a container in a JSON format
+
+Container Logs
+Command: docker logs {container_name/container_id}
+
+
+******************************************************************************************
+
+Command: docker run ubuntu cat /etc/*release*
+Explaination: This command runs ubuntu image, as there are no processes running inside this image, so 
+it will just exit as soon as it is run, if we want the container to show us some file output, let's say
+we want to view the content of /etc/*release* file, then we would just append the command cat /etc/*release*
+
+Command: docker run ubuntu:16.04 cat /etc/*release*
+Explaination: Above command pulls 16.04 version of ubuntu (if not already present on the host) and 
+outputs /etc/*release* file
+Find out tags in the docker hub
+
+Command: docker run ubuntu sleep 15
+Explaination: The above command runs ubuntu image and sleeps it for 15 seconds and then it exits. You
+won't be able to do anything for first 15 seconds. If you want to run the container in the detached mode
+in the background, use -d
+Command: docker run -d ubuntu sleep 10
+If you want to attach back to the container run the below command
+Command: docker attach {container_id}
+
+You cannot add a port mapping to a container while it is running.
+Command: docker run -p 8080:8080 jenkins/jenkins
+Explaination: This command runs jenkins container and attach port 8080 on the docker host to the 
+8080 port on the container
+
+Command: docker run -p 8080:8080 -v /root/jen:/var/jenkins_home -u root jenkins/jenkins
+Explaination: The above command runs jenkins in attached mode and maps port 8080 on host to port 8080 
+on container and also mounts the host directory jen to container's default file system and the -u
+parameter gave the permission to the container to access the directory jen

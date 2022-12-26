@@ -1,0 +1,25 @@
+docker run nginx
+docker run ubuntu sleep 5
+docker run -d {image_name} (docker run -d ubuntu sleep 10)
+docker attach {container_id}
+
+docker ps
+
+docker ps -a
+
+docker stop {container_name}
+
+docker rm {container_name}
+
+docker images
+
+docker rmi {image_name}
+
+docker pull {image_name}
+
+docker exec {container_name} cat /etc/hosts
+
+docker inspect {container_name/container_id}
+
+docker logs {container_name/container_id}
+

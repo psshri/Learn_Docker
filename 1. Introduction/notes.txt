@@ -91,3 +91,4 @@ Container VS Image
 -An image is a package or a template, it is used to create one or more containers. Containers are running
 instances of images
 
+The underlying host where Docker is installed is called Docker Host or Docker Engine
