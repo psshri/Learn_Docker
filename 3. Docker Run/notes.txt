@@ -83,3 +83,8 @@ Command: docker run -p 8080:8080 -v /root/jen:/var/jenkins_home -u root jenkins/
 Explaination: The above command runs jenkins in attached mode and maps port 8080 on host to port 8080 
 on container and also mounts the host directory jen to container's default file system and the -u
 parameter gave the permission to the container to access the directory jen
+
+Example: Run a container named blue-app using image kodekloud/simple-webapp and set the environment
+variable APP_COLOR to blue. Make the application available on port 38282 on the host. The application
+listens on port 8080
+Command: docker run -e APP_COLOR=blue -p 38282:8080 --name blue-app kodekloud/simple-webapp

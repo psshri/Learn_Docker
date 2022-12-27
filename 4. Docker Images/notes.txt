@@ -64,3 +64,94 @@ the source code of your application as it may change more frequently, only the l
 layers needs to be rebuild.
 
 You can containerize any application.
+
+
+===============================================================================================
+
+Environment Variables
+
+Environment variables are used to pass a certain parameter to the applicatoin code. Otherwise,
+will have to update the application code and build image each time we make any change to 
+the application's parameters
+
+Command: docker run -e APP_COLOR=blue simple-webapp-color
+Explaination: the above command runs a container out of the image simple-webapp-color and passes
+an environment variable APP_COLOR and assigns the value blue to it.
+
+How to find the environment variable set on a container that's already running
+Command: docker inspect {container_name}
+
+=====================================================================
+
+Commands vs Entrypoints
+
+If you run a container based on ubuntu image, it will exit as soon as it is executed, this is because
+unlike VMs, containers are not meant to host an operating system. Containers are meant to run a specific
+task or process such as to host an instance of a web server or application server or a database or simply
+to carry out some kind of computation or analysis. Once the task is complete the container exits, the 
+container only lives as long as the process inside it is alive. If the web service inside the container
+is stopped or crashes the container exits.
+
+The CMD command inside a dockerfile of an image decides what programs will be run within the container
+when it starts for the NGINX image.
+
+In case of an ubuntu image dockerfile, the CMD command is 'bash'. Bash is not really a process like
+web server or database server. It is a shell that listens for inputs from a terminal if it cannot
+find a terminal it exits. When we run an ubuntu container, it launches the bash program, by default 
+docker does not attach a terminal to a container when it is run, so the bash program does not find the
+terminal and so it exits since the process that was started when the container was created finished, 
+the container exits as well.
+
+How do you specify a different command to start the container?
+One way is to append a command to the docker run command and that way it overrides the default command
+specified within the image
+Command: docker run ubuntu sleep 5
+
+How do you make that change permanent?
+If you always want the ubuntu image to sleep 5 seconds when it starts. You would then create your 
+own image from the base ubuntu image and specify in a new command
+
+Dockerfile
+FROM Ubuntu
+CMD sleep 5
+
+docker build -t ubuntu-sleeper .
+
+Format for the CMD command
+
+CMD command param1 ==== CMD sleep 3
+CMD ["command", "param1"] ==== CMD ["sleep", "5"]
+
+What if we want to modify the sleep time amount?
+One way is to pass the command in docker run command. 
+like: docker run ubuntu-sleeper sleep 10
+But we would like to only pass the amount of seconds and not the word 'sleep' actually
+something like: docker run ubuntu-sleeper 10
+we would want the sleep command to be invoked automatically
+This is where the entrypoint instruction comes in.
+
+The entrypoint instruction is like the command instruction as in you can specify the program that will
+be run when the container starts and whatever you specify on the command line, in this case 10, will
+append to the entrypoint, so the commands that will be run when the container starts is sleep 10
+
+Dockerfile
+FROM Ubuntu
+ENTRYPOINT ["sleep"]
+
+docker run ubuntu-sleeper 10
+In the above command if we do not add 10 as the command, then will get error that the operand is missing.
+So, how would you configure a default value for the command if one is not specified in the command line.
+That's where you would use both entry point as well as command 
+
+Dockerfile
+FROM Ubuntu
+ENTRYPOINT ["sleep"]
+CMD ["5"]
+
+if you want to use the CMD and ENTRYPOINT command together, do use the JSON format only
+
+So basically, in case of CMD instructions, the command line parameters passed will get replaced entirely
+whereas in case of entrypoint the command line parameters will get appended
+
+If you want to replace the ENTRYPOINT command itself, then specify it during docker run command
+like: docker run --entrypoint sleep2.0 unbuntu-sleeper 10

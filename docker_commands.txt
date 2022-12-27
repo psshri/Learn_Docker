@@ -1,7 +1,12 @@
 docker run nginx
 docker run ubuntu sleep 5
 docker run -d {image_name} (docker run -d ubuntu sleep 10)
+docker run -e APP_COLOR=blue mmumshad/simple-webapp-color
+docker run -e APP_COLOR=blue -p 38282:8080 --name blue-app kodekloud/simple-webapp
+docker run --entrypoint sleep2.0 ubuntu-sleeper 10
+
 docker attach {container_id}
+
 
 docker ps
 
@@ -24,7 +29,9 @@ docker inspect {container_name/container_id}
 docker logs {container_name/container_id}
 
 docker build Dockerfile -t psshri/mywebapp
+docker build -t webapp .
 
+docker login
 docker push psshri/mywebapp
 
 docker history {image_name}
