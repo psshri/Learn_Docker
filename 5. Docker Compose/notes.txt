@@ -1,0 +1,167 @@
+If we need to setup a complex application running multiple services, a better way to do it is to use
+Docker compose.
+
+We can create a configuration file in Yaml format called Docker-compose.yaml and put together the
+different services and the options specific to those services. Then we can simply run docker compose up 
+command to bring up the entire application stack
+
+It is easier to run, implement and maintain it this way as all changes are always stored in the docker 
+compose configuration file. However this is all only applicable to running containers on a single
+Docker host.
+
+***********************************************
+docker run mmumshad/simple-webapp
+docker run mongodb
+docker run redis:alpine
+docker run ansible
+
+docker-compose.yaml
+services:
+    web:
+        image: "mmumshad/simple-webapp"
+    databases:
+        image: "mongodb"
+    messaging:
+        image: "redis:alpine"
+    orchestration:
+        image: "ansible"
+
+docker-compose up
+***********************************************
+
+Sample voting applicatoin
+
+There are 5 components in this application: 
+1. Voting-app : it is a web app developed with python
+2. In-memory DB : redis, in-memory db
+3. Worker : written in .NET
+4. DB : PostgreSQL
+5. Result-app : web app developed in Node.js
+
+Voting-app provides a user interface to select one amongst cat or dog. When a user makes a selection, 
+the vote is stored in redis which serves as an in-memory db. This vote is then processed by the worker.
+The worker app takes the new vote and updates the persistent DB. The result-app displays the result.
+
+This is the architecture and data flow of this simple voting app.
+
+Let's see how we can put together this application stack on a single docker host using docker run.
+Let's assume that all the images of applications are already built and stored in docker repository.
+Following are the docker run commands that we will use:
+
+docker run -d --name=redis redis
+docker run -d --name=db postgres
+docker run -d --name=vote -p 5000:80 voting-app
+docker run -d --name=result -p 5001:80 result-app
+docker run -d --name=worker worker
+
+If we run these commands, we can see that the containers will spin up, but we haven't linked them together
+yet. This is where we use links
+
+docker run -d --name=vote -p 5000:80 --link redis:redis voting-app
+docker run -d --name=result -p 5001:80 -- link db:db result-app
+docker run -d --name=worker -- link redis:redis -link db:db worker
+
+Using the above commands, we have linked the voting-app to in-memory db, result-app to db and
+worker to in-memory db and db.
+
+Links are now depreciated because advanced functionalities in docker swarm and networking helps us to do
+this in a better way
+
+let's now create a docker-compose file with these docker run commands
+
+--------------------------------------
+docker-compose.yaml
+redis:
+    image: redis
+db:
+    image: postgres:94
+vote:
+    image: voting-app
+    ports:
+        - 5000:80
+    links:
+        - redis:redis
+result:
+    image: result-app
+    ports:
+        - 5001:80 
+    links:
+        - db:db
+worker:
+    image: worker
+    links:
+        - redis:redis
+        - db:db
+---------------------------------------
+
+docker-compose up
+
+
+docker compose versions
+In the first version, you cannot specify the order of container creation and also, docker-compose attaches
+all the containers it runs to the default bridged network and then use links to enable communication
+between the containers.
+
+In version 2, docker compose automatically creates a dedicated bridge network for this application
+and then attaches all containers to that new network. All containers are then able to communicate to each
+other using each other's service name. So you don't need to use links in version 2 of Docker compose.
+Version 2 also introduced a 'depends on' feature if you wish to specify a startup order.
+Version 3 is the latest as of today. We can add network bridge in version 3.
+
+following is the version 1 of docker-compose.yaml file
+
+redis:
+    image: redis
+db:
+    image: postgres:9.4
+vote:
+    image: voting-app
+    ports:
+        - 5000:80
+    links:
+        - redis
+
+following is the version 2 of docker-compose.yaml file
+
+version: 2
+services: 
+    redis:
+        image: redis
+    db:
+        image: postgres:9.4
+    vote:
+        image: voting-app
+        ports: 
+            - 5000:80
+        depends_on:
+            - redis
+
+version: 3
+services:
+    redis:
+        image: redis
+        networks:
+            - back-end
+    db:
+        image: postgres:9.4
+        networks:
+            - back-end
+    vote:
+        image: voting-app
+        ports: 
+            - 5000:80
+        networks:
+            - front-end
+            - back-end
+    result:
+        image: result
+        networks:
+            - front-end
+            - back-end
+networks:
+    front-end:
+    back-end:
+
+
+-------------------------------------------------------------
+
