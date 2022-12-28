@@ -7,6 +7,8 @@ docker run --entrypoint sleep2.0 ubuntu-sleeper 10
 docker -H=ipa:port run nginx
 docker run --cpus=.5 ubuntu
 docker run --memory=100m ubuntu
+docker run ubuntu --network=none
+docker run -d --name=vote -p 5000:80 --link redis:redis voting-app
 
 docker attach {container_id}
 
@@ -41,3 +43,10 @@ docker history {image_name}
 docker-compose up
 
 docker volume create data_volume
+docker run -v data_volume:/var/lib/mysql mysql
+docker run -v /data/mysql:/var/lib/mysql mysql
+docker run --mount type=bind,source=/data/mysql,target=/var/lib/mysql mysql
+
+docker network create --driver bridge --subnet 182.18.0.0/16 --gateway 182.18.0.1 custom-isolated-network
+docker network ls
+docker network inspect {network_name}

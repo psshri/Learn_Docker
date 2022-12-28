@@ -73,3 +73,26 @@ persistent volume to the container. To do this, first create a volume using the 
 command. 
 Command: docker volume create data_volume
 Explaination: this command creates a folder 'data_volume' under /var/lib/docker/volumes
+Then when we run the container using the docker run command we can mount this volume inside the 
+container's read write layer using the following command
+Command: docker run -v data_volume:/var/lib/mysql mysql
+Explaination: /var/lib/mysql is the default location where mysql store data inside a container.
+All data written by the database is stored in the volume created on the docker host. Even if the 
+container is destroyed now, the data will persist. If you did not create a volume befor executing
+docker run -v command, docker will automatically create a volume for you and mount it to the container.
+
+let's say we have our data at the location /data in the docker host and we would like our container to 
+write the data to this location and not in the default /var/lib/docker folder. In this case, we would
+provide the complete part of the folder we would like to mount like below
+Command: docker run -v /data/mysql:/var/lib/mysql mysql
+This is called bind mounting
+
+There are two types of mounts: volume mounting and bind mount. Volume mount mounts a volume from the 
+volumes directory and bind mount mounts a directory from any location on the docker host.
+
+It is the responsibility of storage driver to maintain the layered architecture, create a writable 
+layer, moving files across layers.
+
+Some common storage drivers are: AUFS, ZFS, BTRFS, Device Mapper, Overlay, Overlay2
+The selection of the storage driver depends on the underlying OS used. With Ubuntu, the default storage
+driver is AUFS. Docker will automatically choose the best storage driver based on the OS.
