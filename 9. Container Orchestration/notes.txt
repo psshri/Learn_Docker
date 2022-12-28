@@ -1,0 +1,2 @@
+Container orchestration consists of a set of tools and scripts that can help host containers in a 
+production.

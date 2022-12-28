@@ -1,0 +1,28 @@
+Docker images are stored in a docker registry. A docker registry is a central repository of all Docker
+images
+
+docker run nginx
+docker run docker.io/nginx/nginx
+
+You can login to your private docker registry via following command
+Command: docker login private-registry.io
+
+Also, always login first before pulling or pushing from/to a private registry
+
+________________________________________________________________________
+
+How to deploy a private registry of your own?
+
+The docker registry is itself another application and is available as a docker image, the name of the
+image is registry and it exposes the API on port 5000. Use the following command to run the private 
+registry container.
+Command: docker run -d -p 5000:5000 --name registry registry:2
+Now, how do you push your own image to this? Use the docker image tag command to tag the image with a 
+private registry url in it. In this case since it is running on the same host, we can use the localhost
+Command: docker image tag my-image localhost:5000/my-image
+Now we can push our image to our local private registry using the docker push command
+Command: docker push localhost:5000/my-image
+We can pull the image using the following command
+Command: docker pull localhost:5000/my-image
+Command: docker pull 192.168.56.100/my-image
+
