@@ -29,6 +29,7 @@ docker rmi {image_name}
 docker pull {image_name}
 
 docker exec {container_name} cat /etc/hosts
+docker exec -it {container_id} /bin/sh
 
 docker inspect {container_name/container_id}
 
@@ -43,6 +44,8 @@ docker push psshri/mywebapp
 docker history {image_name}
 
 docker-compose up
+docker-compose -f {filename.yaml} up
+docker-compose -f {filename.yaml} down 
 
 docker volume create data_volume
 docker run -v data_volume:/var/lib/mysql mysql
